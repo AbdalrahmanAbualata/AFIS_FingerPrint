@@ -1,0 +1,789 @@
+﻿
+@{
+    ViewBag.Title = "DecimalFingerPrint";
+    
+}
+
+<head>
+
+    @*SDK INTGREATED BIO MATRIC*@
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>IBSU Web Demonstration</title>
+    <!-- Note: Demo requires bootstrap 3 -->
+    @*<link href="~/css/bootstrap.min.css" rel="stylesheet" />*@
+    <link href="~/css/site.css" rel="stylesheet" />
+
+    <link href="~/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="~/css/templatemo-style.css" rel="stylesheet" />
+
+
+    @*AFIS FINGER Print*@
+    <title>AFIS Service</title>
+    <link href="~/bootstrap-3.3.6-dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="~/style/enu.css" rel="stylesheet" />
+    
+
+
+
+
+
+    <style type="text/css">
+        .detail {
+            height: 50px !important;
+        }
+
+        .handsMain {
+            width: 420px;
+            height: 240px;
+            margin-right: 400px;
+            zoom: 1.5;
+        }
+
+        .leftHand {
+            position: relative;
+            padding: 0;
+            margin: 0;
+            width: 207px;
+            height: 236px;
+            float: left;
+        }
+
+        .rightHand {
+            position: relative;
+            padding: 0;
+            margin: 0;
+            width: 207px;
+            height: 236px;
+            float: right;
+        }
+
+        .pinkyFingerLeft {
+            background-color: #827b7b;
+            display: block;
+            width: 15px;
+            height: 25px;
+            position: absolute;
+            top: 61px;
+            left: 1px;
+            border-radius: 6px;
+            transform: rotate(-20deg);
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+            cursor: pointer;
+        }
+
+        .ringFingerLeft {
+            background-color: #827b7b;
+            display: block;
+            width: 17px;
+            height: 24px;
+            position: absolute;
+            top: 14px;
+            left: 40px;
+            transform: rotate(-9deg);
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+            cursor: pointer;
+        }
+
+        .middleFingerLeft {
+            background-color: #827b7b;
+            display: block;
+            width: 19px;
+            height: 24px;
+            position: absolute;
+            top: 0px;
+            left: 78px;
+            transform: rotate(-2deg);
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+            cursor: pointer;
+        }
+
+        .indexFingerLeft {
+            background-color: #827b7b;
+            display: block;
+            width: 19px;
+            height: 23px;
+            position: absolute;
+            top: 15px;
+            left: 122px;
+            transform: rotate(3deg);
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+            cursor: pointer;
+        }
+
+        .thumbFingerLeft {
+            background-color: #827b7b;
+            display: block;
+            width: 15px;
+            height: 24px;
+            position: absolute;
+            top: 95px;
+            left: 188px;
+            transform: rotate(43deg);
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+            cursor: pointer;
+        }
+
+        .pinkyFingerRight {
+            background-color: #827b7b;
+            display: block;
+            width: 15px;
+            height: 25px;
+            position: absolute;
+            top: 61px;
+            right: 1px;
+            border-radius: 6px;
+            transform: rotate(20deg);
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+            cursor: pointer;
+        }
+
+        .ringFingerRight {
+            background-color: #827b7b;
+            display: block;
+            width: 17px;
+            height: 24px;
+            position: absolute;
+            top: 14px;
+            right: 40px;
+            transform: rotate(9deg);
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+            cursor: pointer;
+        }
+
+        .middleFingerRight {
+            background-color: #827b7b;
+            display: block;
+            width: 19px;
+            height: 24px;
+            position: absolute;
+            top: 0px;
+            right: 78px;
+            transform: rotate(2deg);
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+            cursor: pointer;
+        }
+
+        .indexFingerRight {
+            background-color: #827b7b;
+            display: block;
+            width: 19px;
+            height: 23px;
+            position: absolute;
+            top: 15px;
+            right: 122px;
+            transform: rotate(-3deg);
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+            cursor: pointer;
+        }
+
+        .thumbFingerRight {
+            background-color: #827b7b;
+            display: block;
+            width: 15px;
+            height: 24px;
+            position: absolute;
+            top: 95px;
+            right: 188px;
+            transform: rotate(-43deg);
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+            cursor: pointer;
+        }
+
+        input[name="fingur"] {
+            float: right;
+        }
+
+        .largeContainer {
+            height: 500px;
+        }
+
+        #imgNistQuality {
+            margin-left: -27px !important;
+            width: 230px;
+        }
+
+        .btn-group-sm > .btn, .btn-sm {
+            padding: 5px 10px;
+            font-size: 15px;
+            margin-top: 10px;
+            line-height: 1.5;
+            font-weight: bold;
+            background: #1f3646 !important;
+            border-bottom: 3px solid #9e8615 !important;
+        }
+
+        #btnCapture:before {
+            content: "\f030";
+        }
+
+
+        p#title {
+            margin-left: 168px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #1f3646;
+        }
+
+        input[name="fingur"] {
+            float: right;
+            accent-color: green;
+        }
+
+        input[type=checkbox], input[type=radio] {
+            margin: 5px 2px 0px;
+            margin-top: 1px\9;
+            line-height: normal;
+            accent-color: green;
+        }
+
+        input#btnCaptureLeftHand {
+            position: absolute;
+            z-index: 999;
+            top: 231px;
+            left: 25px;
+            font-size: 10px;
+        }
+
+        input#btnCaptureRightHand {
+            position: absolute;
+            z-index: 999;
+            top: 231px;
+            left: 45px;
+            font-size: 10px;
+        }
+
+        input#btnCaptureTumb {
+            position: absolute;
+            z-index: 999;
+            top: 173px;
+            left: 160px;
+            font-size: 8px;
+        }
+
+        input[type=checkbox]:checked + label::before {
+            content: "";
+            display: block;
+            position: absolute;
+            text-align: center;
+            height: 20px;
+            width: 20px;
+            left: 0;
+            top: 5px;
+            background-color: red;
+            font-family: "Montserrat";
+            border-radius: 2px;
+            border: 1px solid rgb(150 150 150 / 30%);
+        }
+    </style>
+
+</head>
+<body>
+    <form runat="server" name="myForm">
+
+
+        <!-- Accordion -->
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-11">
+                    <div class="preview">
+                        <div id="integration-list">
+                            <ul>
+                                <li>
+                                    <a class="expand">
+                                        <div class="right-arrow">+</div>
+                                        <h3> ألاعدادات <i class="fa fa-cog"></i>  </h3>
+                                       
+                                    </a>
+                                    <div id="divCaptureControls" class="detail" style="float:right; text-align:right; padding-right:26px ; display:block">
+                                        <select id="sDevicesIds" name="sDevicesName" style="display:none;"></select><label id="lblDeviceId" style="display:none;">:أسم الجهاز</label>
+                                        <select id="sImageFormats" style="display:none;"></select><label id="lblImageFormats" style="display:none;"> :صيغة الصورة</label>
+                                        <select id="sResponseType" style="display:none;"></select><label id="lblResponseType" style="display:none;">:نوع الاستجابة </label>
+                                        <asp:HiddenField runat="server" ID="deviceGUID" Value="" />
+
+
+                                        @*<%--  <select id="sFingerIndex"></select><label id="lblIFingerIndex">:اسم الاصبع  </label>--%>*@
+                                        <select id="sFingerOwner">
+                                            <option value="15">بصمة صاحب الجواز الحية</option>
+                                            <option value="16">بصمة ولي الأمر</option>
+                                        </select>
+
+                                        <label id="lblIFingerIndex">: صاحب البصمة</label>
+                                        <input type="button" id="btnEna" value="Enable" style="display:none;">
+                                        <input type="button" id="btnDis" value="Disable" style="display:none;">
+                                        <input type="button" id="btnClearOptions" value="Claer Options" style="display:none;">
+
+                                    </div>
+                                </li>
+
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!-- end Accordion -->
+            </div><!--row end-->
+        </div><!--container-end-->
+        <div class="container">
+
+
+
+
+            <div class="row">
+
+                <div class="col-sm-1" style="margin-top:90px;">
+                    @*<div class="row">
+                    <p id="title">التقاط</p>
+                    <img id="imgNistQuality" width="195" height="40" style="margin-left:0px !important;" src="img/NIST-quality.bmp" />
+                </div>*@
+                    @*<%-- <div class="row">
+                    <img id="imgFingerImage" width="180" src="img/Fingerprint.jpg" />
+                </div>--%>*@
+
+                    <div class="row">
+                        <div class="status" style="margin-top:180px;margin-left:30px;">
+                            <label id="lblSensorStatus"></label>
+                            <br /><br />
+                            <label id="lblVerifyStatus"></label>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-sm-9">
+                    <div id="divControls">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <input type="button" id="btnVerify" name="btnVerify" value="تحقق" style="width: 30%;" class="btn btn-primary btn-sm" />
+                                <input type="button" id="btnSave" onclick="ButtonSaveCapture();" name="btnSave" style="width: 30%;" class="btn btn-primary btn-sm" value="حفظ" />
+                               
+                            </div>
+
+                            <div class="col-sm-6">
+
+                            </div>
+
+
+                        </div>
+
+                        <!--<%--<input type="button" id="btnCapture" name="btnCapture" value="اخذ بصمة" class="btn btn-primary btn-sm" /> --%>-->
+                        <!--OnClientClick="btnCapture_ClientClick"-->
+                        <!--<input type="button" id="btnVerify" value="Verify" class="btn btn-primary btn-sm" />-->
+                        <!--<%-- OnClientClick="return btnSaveClient_Click()"--%>-->
+                        <!-- Asp Hidden Fields Used for passing values to Server Page Start -->
+                        <asp:HiddenField id="capturedfingerNameVal" Value="" runat="server" />
+                        <asp:HiddenField id="VerificationResult" Value="" runat="server" />
+                        <asp:HiddenField id="fingerOwnerVal" Value="" runat="server" />
+                        <asp:HiddenField id="fingerIndexVal" Value="" runat="server" />
+                        <asp:HiddenField id="pFingerTaken" Value="" runat="server" />
+                        <!-- Asp Hidden Fields Used for passing values to Server Page End -->
+                        <!--<Button id="btnVerify" name="btnVerify" text="تحقق" class="btn btn-primary btn-sm" OnClientClick="btnVerifyClient_Click()"/>-->
+
+                    </div>
+
+
+                    <div
+				<br /><br /><br />
+			    <div class="row">
+
+
+				     <div class="col-sm-2">
+
+				     </div >
+				     <div class="col-sm-2">
+
+				<div class="handsMain">
+
+                    <div class="leftHand">
+
+                        <input type="button" id="btnCaptureTumb" name="btnCapture" onclick="CaptureThumbsHand();" value="إلتقاط بصمات الإبهام" class="btn btn-primary btn-sm" />
+                        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                             width="206.347px" height="231.999px" viewBox="0 0 206.347 231.999" fill=#ffcc99 style="enable-background:new 0 0 206.347 231.999;"
+                             xml:space="preserve">
+                        <path d="M94.012,231.999c-2.911-0.371-5.824-0.728-8.732-1.116c-7.994-1.064-15.926-2.385-23.511-5.29
+						c-6.8-2.604-11.581-7.273-15.256-13.54c-5.378-9.171-8.267-19.101-10.46-29.381c-3.025-14.18-5.557-28.539-9.793-42.364
+						c-3.343-10.911-8.62-21.285-13.618-31.617C7.399,97.852,3.035,86.764,0.478,75.006c-0.5-2.297-0.595-4.781-0.345-7.122
+						c0.52-4.866,5.444-7.338,9.618-4.764c1.902,1.173,3.876,2.866,4.837,4.809c2.822,5.7,5.477,11.528,7.611,17.515
+						c5.072,14.235,12.851,26.919,21.617,39.072c1.058,1.467,2.46,2.763,3.922,3.841c2.25,1.659,3.987,1.05,4.153-1.694
+						c0.244-4.033,0.28-8.153-0.26-12.145c-2.312-17.064-4.762-34.112-7.38-51.132c-1.259-8.181-2.986-16.29-4.533-24.425
+						c-1.087-5.714-1.34-11.41,0.194-17.084c0.249-0.92,0.578-1.831,0.986-2.692c2.468-5.209,8.279-6.638,12.496-2.736
+						c1.775,1.643,3.258,4.039,3.927,6.365c2.74,9.526,3.986,19.322,4.975,29.188c0.81,8.075,2.519,16.058,3.738,24.096
+						c1.171,7.718,2.131,15.469,3.371,23.175c0.566,3.521,1.414,7.024,2.497,10.419c0.325,1.02,1.894,2.3,2.857,2.271
+						c0.925-0.028,2.407-1.487,2.596-2.511c0.824-4.449,1.609-8.958,1.758-13.467c0.193-5.822-0.334-11.665-0.369-17.5
+						c-0.04-6.55,0.324-13.107,0.148-19.651c-0.261-9.728-0.69-19.458-1.338-29.168C77.071,22.417,76.007,15.176,77.895,8
+						c1.03-3.913,3.118-6.976,7.517-7.782c3.705-0.679,5.875,0.168,7.842,3.411c2.503,4.125,3.444,8.77,3.909,13.455
+						c1.377,13.898,2.809,27.798,3.755,41.729c0.617,9.083,0.119,18.24,0.708,27.326c0.363,5.599,1.678,11.16,2.882,16.668
+						c0.432,1.978,1.206,4.576,3.922,4.486c2.741-0.091,3.146-2.748,3.56-4.758c1.171-5.693,2.059-11.443,3.088-17.165
+						c1.508-8.392,3.029-16.782,4.566-25.169c1.653-9.021,1.34-18.137,1.492-27.242c0.058-3.474,0.708-6.977,1.44-10.391
+						c0.665-3.098,2.689-5.41,5.475-6.959c3.83-2.129,8.236-1.181,10.066,2.764c1.549,3.34,3.04,7.092,3.072,10.674
+						c0.082,9.33-0.298,18.699-1.147,27.992c-1.175,12.862-2.918,25.673-4.475,38.499c-1.336,11.004-1.385,22.008,0.095,32.986
+						c0.423,3.136,1.164,6.298,2.265,9.26c2.425,6.52,6.911,7.633,11.918,2.757c2.76-2.688,5.085-5.955,7.063-9.284
+						c3.503-5.897,6.193-12.306,9.983-17.994c2.835-4.254,6.486-8.173,10.449-11.417c6.48-5.304,14.231-6.938,22.546-5.559
+						c0.079,0.013,0.16,0.016,0.237,0.034c6.526,1.58,7.959,5.335,4.109,10.858c-0.776,1.113-1.57,2.254-2.551,3.175
+						c-8.747,8.214-14.314,18.55-19.488,29.138c-5.644,11.55-10.754,23.387-16.919,34.648c-7.681,14.029-16.492,27.424-26.986,39.563
+						c-9.502,10.991-21.726,16.771-36.229,17.738c-0.771,0.051-1.525,0.364-2.287,0.555C97.852,231.999,95.932,231.999,94.012,231.999z" />
+
+
+
+
+
+                        <ul class="lefhandlist">
+                        <li class="pinkyFingerLeft" style="background:#ffe0bd;"> <input type="checkbox" onchange="ChnageCheckRadio(this)" name="LittleLeft" title="الخنصر - اليد اليسرى" value="0"></li>
+                        <li class="ringFingerLeft" style="background:#ffe0bd;"><input type="checkbox" onchange="ChnageCheckRadio(this)" name="RingLeft" title="البنصر - اليد اليسرى" value="1"></li>
+                        <li class="middleFingerLeft" style="background:#ffe0bd;"><input type="checkbox" onchange="ChnageCheckRadio(this)" name="MiddleLeft" title="الوسطى - اليد اليسرى" value="2"></li>
+                        <li class="indexFingerLeft" style="background:#ffe0bd;"><input type="checkbox" onchange="ChnageCheckRadio(this)" name="IndexLeft" title="السبابة - اليد اليسرى" @*<%--checked="checked"--%> value="3"*@></li>
+                        <li class="thumbFingerLeft" style="background:#ffe0bd;"><input type="checkbox" onchange="ChnageCheckRadio(this)" name="ThumbLeft" title="الإبهام - اليد اليسرى" value="4"></li>
+					</ul>
+					</svg>
+
+                        <input type="button" id="btnCaptureLeftHand" onclick="CaptureLeftHand();" name="btnCapture" value="إلتقاط بصمه اليد اليسرى" class="btn btn-primary btn-sm" />
+                       
+                    </div>
+
+
+					<div class="rightHand">
+					<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+						 width="206.347px" height="231.999px" viewBox="0 0 206.347 231.999" fill=#ffcc99 enable-background="new 0 0 206.347 231.999"
+						 xml:space="preserve">
+					<path d="M106.573,231.996c-0.762-0.191-1.516-0.504-2.287-0.555c-14.503-0.967-26.727-6.747-36.229-17.738
+						c-10.494-12.139-19.305-25.534-26.986-39.563c-6.165-11.261-11.275-23.098-16.919-34.648c-5.174-10.588-10.741-20.924-19.488-29.138
+						c-0.981-0.921-1.775-2.062-2.551-3.175c-3.85-5.523-2.417-9.278,4.109-10.858c0.077-0.018,0.158-0.021,0.237-0.034
+						c8.315-1.379,16.066,0.255,22.546,5.559c3.963,3.244,7.614,7.163,10.449,11.417c3.79,5.688,6.48,12.097,9.983,17.994
+						c1.978,3.329,4.303,6.596,7.063,9.284c5.007,4.876,9.493,3.763,11.918-2.757c1.101-2.962,1.842-6.124,2.265-9.26
+						c1.48-10.978,1.431-21.982,0.095-32.986c-1.557-12.826-3.3-25.637-4.475-38.499c-0.849-9.293-1.229-18.662-1.147-27.992
+						c0.032-3.582,1.523-7.334,3.072-10.674c1.83-3.945,6.236-4.893,10.066-2.764c2.786,1.549,4.81,3.861,5.475,6.959
+						c0.732,3.414,1.382,6.917,1.44,10.391c0.152,9.105-0.161,18.221,1.492,27.242c1.537,8.387,3.058,16.777,4.566,25.169
+						c1.029,5.722,1.917,11.472,3.088,17.165c0.414,2.01,0.819,4.667,3.56,4.758c2.716,0.09,3.49-2.508,3.922-4.486
+						c1.204-5.508,2.519-11.069,2.882-16.668c0.589-9.086,0.091-18.243,0.708-27.326c0.946-13.931,2.378-27.831,3.755-41.729
+						c0.465-4.685,1.406-9.33,3.909-13.455c1.967-3.243,4.137-4.09,7.842-3.411c4.399,0.806,6.487,3.869,7.517,7.782
+						c1.888,7.176,0.824,14.417,0.341,21.666c-0.648,9.71-1.077,19.44-1.338,29.168c-0.176,6.544,0.188,13.101,0.148,19.651
+						c-0.035,5.835-0.562,11.678-0.369,17.5c0.149,4.509,0.934,9.018,1.758,13.467c0.189,1.024,1.671,2.483,2.596,2.511
+						c0.963,0.029,2.532-1.251,2.857-2.271c1.083-3.395,1.931-6.898,2.497-10.419c1.24-7.706,2.2-15.457,3.371-23.175
+						c1.219-8.038,2.928-16.021,3.738-24.096c0.989-9.866,2.235-19.662,4.975-29.188c0.669-2.326,2.152-4.722,3.927-6.365
+						c4.217-3.902,10.028-2.473,12.496,2.736c0.408,0.861,0.737,1.772,0.986,2.692c1.534,5.674,1.281,11.37,0.194,17.084
+						c-1.547,8.135-3.274,16.244-4.533,24.425c-2.618,17.02-5.068,34.068-7.38,51.132c-0.54,3.992-0.504,8.112-0.26,12.145
+						c0.166,2.744,1.903,3.353,4.153,1.694c1.462-1.078,2.864-2.374,3.922-3.841c8.766-12.153,16.545-24.837,21.617-39.072
+						c2.134-5.987,4.789-11.815,7.611-17.515c0.961-1.943,2.935-3.636,4.837-4.809c4.174-2.574,9.098-0.102,9.618,4.764
+						c0.25,2.341,0.155,4.825-0.345,7.122c-2.557,11.758-6.921,22.846-12.164,33.685c-4.998,10.332-10.275,20.706-13.618,31.617
+						c-4.236,13.825-6.768,28.184-9.793,42.364c-2.193,10.28-5.082,20.21-10.46,29.381c-3.675,6.267-8.456,10.936-15.256,13.54
+						c-7.585,2.905-15.517,4.226-23.511,5.29c-2.908,0.388-5.821,0.745-8.732,1.116C110.413,231.999,108.493,231.999,106.573,231.996z"/>
+
+						<ul class="righthandlist">
+				        <li class="thumbFingerRight" style="background:#ffe0bd;"><input type="checkbox"    onchange="ChnageCheckRadio(this)" name="ThumbRight" title= "الإبهام - اليد اليمنى" value="5"></li>
+						<li class="indexFingerRight" style="background:#ffe0bd;"><input type="checkbox"    onchange="ChnageCheckRadio(this)"name="IndexRight" title= "السبابة - اليد اليمنى" value="6"></li>
+						<li class="middleFingerRight" style="background:#ffe0bd;"><input type="checkbox"    onchange="ChnageCheckRadio(this)" name="MiddleRight" title= "الوسطى - اليد اليمنى" value="7"></li>
+						<li class="ringFingerRight" style="background:#ffe0bd;"><input type="checkbox"    onchange="ChnageCheckRadio(this)" name="RingRight" title= "البنصر - اليد اليمنى" value="8"></li>
+						<li class="pinkyFingerRight" style="background:#ffe0bd;"><input type="checkbox"    onchange="ChnageCheckRadio(this)" name="LittleRight" title= "الخنصر - اليد اليمنى" value="9"></li>
+			            </ul>
+					</svg>
+							<input type="button"  id="btnCaptureRightHand" name="btnCapture" onclick="CaptureRightHand();" value="إلتقاط بصمه اليد اليمنى" class="btn btn-primary btn-sm" />
+					</div>
+
+			    </div>
+
+				</div>
+
+				</div>
+        </div>
+
+
+
+                    @*<%--
+                <div class="col-sm-2" style="margin-top:90px;">
+                    <div id="verifyFPImagediv">
+                        <div class="row">
+                            <p id="title">التحقق</p>
+                            <img id="imgNistQuality_validate" width="230" height="40" style="margin-left:0px !important;" src="img/NIST-quality.bmp" />
+
+                        </div>
+                        <div class="row">
+                            <img id="imgFingerImage_validate" width="230" height="195" src="img/Fingerprint.jpg" />
+                        </div>
+
+                        <div class="row">
+                            <div class="status" style="margin-top:180px;margin-left:30px;">
+                                <label id="lblSensorStatus"></label>
+                                <br /><br />
+                                <label id="lblVerifyStatus"></label>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>--%>*@
+
+                </div><!-- row end -->
+
+            </div><!--container end-->
+
+            @section script
+{
+                <script src="~/Content/axios.js"></script>
+                <script src="Scripts/jquery-1.10.2.min.js"></script>
+                <script src="Scripts/jquery-1.10.2.js"></script>
+
+
+                <script language="javascript" type="text/javascript">
+
+                    var web_window;
+                  
+                    localStorage.setItem("locationURL", window.location.href);
+                                    
+                    var UrlCheackServiceRuning = "http://localhost:12300/api/AFISHome/CheackSerivceRuning"
+                       
+                    ShowModelPopUp = function () {
+                        
+                    }
+
+                    class AFIS_FAFM_Right {
+                        constructor() {
+
+                            this.Hand = { position: "RightHand", image: { dataBytes: "", format: "" }, fingerprints: [], missingFingerprints: [] };
+
+                        }
+
+
+                    }
+
+                    class AFIS_FAFM_Left {
+                        constructor() {
+
+                            this.Hand = { position: "LeftHand", image: { dataBytes: "", format: "" }, fingerprints: [], missingFingerprints: [] };
+
+                        }
+
+                    }
+
+                    class AFIS_FAFM_Thumbs {
+                        constructor() {
+                            this.Thumbs = { position: "Thumbs", image: { dataBytes: "", format: "" }, fingerprints: [], missingFingerprints: [] };
+
+                        }
+
+                    }
+  
+                    function CaptureRightHand() {
+
+                       
+                     
+
+                        var xxx = "\\" + "\\10.130.149.107\\Shared\\MediaUploader" + event.data;
+
+                        let ObjRightHand = new AFIS_FAFM_Right();
+                         
+                        var IndexRight = document.getElementsByName("IndexRight");
+                        var MiddleRight = document.getElementsByName("MiddleRight");
+                        var RingRight = document.getElementsByName("RingRight");
+                        var LittleRight = document.getElementsByName("LittleRight");
+
+
+                        //Fonded Finger
+                        if (IndexRight[0].checked) {
+                            ObjRightHand.Hand.fingerprints.push({ position: "RightIndex", image: { dataBytes: "", format: "" } });
+                        } if (MiddleRight[0].checked) {
+                            ObjRightHand.Hand.fingerprints.push({ position: "RightMiddle", image: { dataBytes: "", format: "" } });
+                        } if (RingRight[0].checked) {
+                            ObjRightHand.Hand.fingerprints.push({ position: "RightRing", image: { dataBytes: "", format: "" } });
+                        } if (LittleRight[0].checked) {
+                            ObjRightHand.Hand.fingerprints.push({ position: "RightLittle", image: { dataBytes: "", format: "" } });
+
+                        }
+
+                        //Missing Finger
+
+                        if (!IndexRight[0].checked) {
+                            ObjRightHand.Hand.missingFingerprints.push({ missingReasonCode: "", missingReasonText: "cut", position: "RightIndex" });
+                        } if (!MiddleRight[0].checked) {
+                            ObjRightHand.Hand.missingFingerprints.push({ missingReasonCode: "", missingReasonText: "cut", position: "RightMiddle" });
+                        } if (!RingRight[0].checked) {
+                            ObjRightHand.Hand.missingFingerprints.push({ missingReasonCode: "", missingReasonText: "cut", position: "RightRing" });
+                        } if (!LittleRight[0].checked) {
+                            ObjRightHand.Hand.missingFingerprints.push({ missingReasonCode: "", missingReasonText: "cut", position: "RightLittle" });
+                        }
+                       
+                        localStorage.removeItem("KK");
+                        localStorage.setItem("KK", JSON.stringify(ObjRightHand));
+                       
+                        web_window = window.open('/AIFS_Fingers/OpenModelPopup?TYPE_ID=1', "PopupWindow", 'width=1200px,height=550px,top=100,left=150;');
+                        var omran = 5; 
+                         
+                    }
+                     
+                    function CaptureLeftHand() {
+                        //Just Left Hand
+                        let ObjLeftHand = new AFIS_FAFM_Left();
+                         
+                    
+
+                        var IndexLeft = document.getElementsByName("IndexLeft");
+                        var MiddleLeft = document.getElementsByName("MiddleLeft");
+                        var RingLeft = document.getElementsByName("RingLeft");
+                        var LittleLeft = document.getElementsByName("LittleLeft");
+
+
+                        if (LittleLeft[0].checked) {
+                            ObjLeftHand.Hand.fingerprints.push({ position: "LeftLittle", image: { dataBytes: "", format: "" } });
+
+                        } if (RingLeft[0].checked) {
+                            ObjLeftHand.Hand.fingerprints.push({ position: "LeftRing", image: { dataBytes: "", format: "" } });
+
+                        } if (MiddleLeft[0].checked) {
+                            ObjLeftHand.Hand.fingerprints.push({ position: "LeftMiddle", image: { dataBytes: "", format: "" } });
+
+                        } if (IndexLeft[0].checked) {
+                            ObjLeftHand.Hand.fingerprints.push({ position: "LeftIndex", image: { dataBytes: "", format: "" } });
+                        }
+
+                        //Missing Finger
+
+                        if (!LittleLeft[0].checked) {
+                            ObjLeftHand.Hand.missingFingerprints.push({ missingReasonCode: "", missingReasonText: "cut", position: "LeftLittle" });
+                        } if (!RingLeft[0].checked) {
+                            ObjLeftHand.Hand.missingFingerprints.push({ missingReasonCode: "", missingReasonText: "cut", position: "LeftRing" });
+                        } if (!MiddleLeft[0].checked) {
+                            ObjLeftHand.Hand.missingFingerprints.push({ missingReasonCode: "", missingReasonText: "cut", position: "LeftMiddle" });
+                        } if (!IndexLeft[0].checked) {
+                            ObjLeftHand.Hand.missingFingerprints.push({ missingReasonCode: "", missingReasonText: "cut", position: "LeftIndex" });
+                        }
+                        
+                        localStorage.removeItem("KK");
+                        localStorage.setItem("KK", JSON.stringify(ObjLeftHand));
+                        web_window = window.open('/AIFS_Fingers/OpenModelPopup?TYPE_ID=2', "PopupWindow", 'width=1200px,height=550px,top=100,left=150;');
+                         
+                    }
+
+
+                    function CaptureThumbsHand() {
+
+                        //Just Thumbs
+
+                        const ObjThumbs = new AFIS_FAFM_Thumbs();
+
+                        var ThumbLeft = document.getElementsByName("ThumbLeft");
+
+                        var ThumbRight = document.getElementsByName("ThumbRight");
+
+                        if (ThumbRight[0].checked) {
+                            ObjThumbs.Thumbs.fingerprints.push({ position: "RightThumb", image: { dataBytes: "", format: "" } });
+
+                        } if (ThumbLeft[0].checked) {
+                            ObjThumbs.Thumbs.fingerprints.push({ position: "LeftThumb", image: { dataBytes: "", format: "" } });
+
+                        }
+
+                        if (!ThumbRight[0].checked) {
+                            ObjThumbs.Thumbs.missingFingerprints.push({ missingReasonCode: "", missingReasonText: "cut", position: "RightThumb" });
+
+                        } if (!ThumbLeft[0].checked) {
+                            ObjThumbs.Thumbs.missingFingerprints.push({ missingReasonCode: "", missingReasonText: "cut", position: "LeftThumb" });
+
+                        }
+
+                       
+                        localStorage.removeItem("KK");
+                        localStorage.setItem("KK", JSON.stringify(ObjThumbs));
+
+                        web_window = window.open('/AIFS_Fingers/OpenModelPopup?TYPE_ID=3', "PopupWindow", 'width=1200px,height=550px,top=100,left=150;');
+                         
+
+                    }
+
+                     
+                    function ButtonSaveCapture() {
+  
+                    }
+
+                    function btnSaveClient_Click() {
+                        alert("Saved Succfuly")
+                    }
+                    
+
+
+                    $(document).ready(function () {
+                       
+                       
+                        let ObjLeftHand = new AFIS_FAFM_Left();
+                        //Right Hand
+                        var IndexRight = document.getElementsByName("IndexRight");
+                        var MiddleRight = document.getElementsByName("MiddleRight");
+                        var RingRight = document.getElementsByName("RingRight");
+                        var LittleRight = document.getElementsByName("LittleRight");
+
+
+                        //Left hand
+                        var IndexLeft = document.getElementsByName("IndexLeft");
+                        var MiddleLeft = document.getElementsByName("MiddleLeft");
+                        var RingLeft = document.getElementsByName("RingLeft");
+                        var LittleLeft = document.getElementsByName("LittleLeft");
+
+
+                        //Thumb hand
+                        var ThumbLeft = document.getElementsByName("ThumbLeft");
+                        var ThumbRight = document.getElementsByName("ThumbRight");
+
+
+                        //Left Hand
+                        ThumbLeft[0].checked = true;
+                        IndexLeft[0].checked = true;
+                        MiddleLeft[0].checked = true;
+                        RingLeft[0].checked = true;
+                        LittleLeft[0].checked = true;
+
+                        //Right Hand
+                        ThumbRight[0].checked = true;
+                        IndexRight[0].checked = true;
+                        MiddleRight[0].checked = true;
+                        RingRight[0].checked = true;
+                        LittleRight[0].checked = true;
+                         
+                        $.ajax({
+                            url: UrlCheackServiceRuning,
+                            type: "POST",
+                            processData: false,
+                            dataType: "json",
+                            contentType: "application/json",
+                            data: JSON.stringify(ObjLeftHand),
+
+                            success: function (response) {
+                              //  alert(response)
+
+                            },
+                            error: function (e) {
+                                 
+                                if (confirm("قد يكون الجهاز غير متوفر او الخدمة متوقفة أو أنه لم يتم تثبيتها . هل تود تحميل تعريف الإصدار الأحدث من الخدمة؟")) {
+                                    window.open("/AFIS_FingerPrint/files/FingerPrintSetup.msi", "_base");
+                                }
+                            }
+                        });
+
+                         
+                        //for (var i = 0; i < ListItem.length; i++) {
+
+                        //	if (ListItem[i].type == 'radio') {
+
+                        //	}
+                        //}
+                    });
+                </script>
+            }
+
+
+            @*SDK BIOMATRIC*@
+
+</form>
+
+
+</body>
+
+

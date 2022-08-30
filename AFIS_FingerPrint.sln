@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32602.291
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AFIS_FingerPrint", "AFIS_FingerPrint\AFIS_FingerPrint.csproj", "{B80D4E9F-C5AC-4265-BBE7-CD1F52CBBDB5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B80D4E9F-C5AC-4265-BBE7-CD1F52CBBDB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B80D4E9F-C5AC-4265-BBE7-CD1F52CBBDB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B80D4E9F-C5AC-4265-BBE7-CD1F52CBBDB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B80D4E9F-C5AC-4265-BBE7-CD1F52CBBDB5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E8718E69-A6A9-4575-90B7-537FB830B8D9}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,1593 @@
+﻿<!doctype html>
+<html>
+<head>
+
+
+    <meta charset="utf-8" />
+    <title>IBScanUltimate Web API Function Tester</title>
+
+    <style>
+        #left {
+            position: relative;
+            float: left;
+            left: 10px;
+            width: 47%;
+        }
+
+        #right {
+            position: relative;
+            width: 47%;
+            float: right;
+        }
+
+        .parent {
+            position: relative;
+            width: 100%;
+        }
+
+        div.titleHeader {
+            width: inherit;
+            border: 1px solid black;
+            padding: 3px;
+            margin: 1px;
+            font-size: small;
+            background-color: lightgray;
+        }
+
+
+        /* Style the tab */
+        div.tab {
+            overflow: hidden;
+            border: 1px solid #ccc;
+            background-color: #f1f1f1;
+        }
+
+            /* Style the buttons inside the tab */
+            div.tab button {
+                background-color: inherit;
+                float: left;
+                border: none;
+                outline: none;
+                cursor: pointer;
+                padding: 14px 16px;
+                transition: 0.3s;
+            }
+
+                /* Change background color of buttons on hover */
+                div.tab button:hover {
+                    background-color: #ddd;
+                }
+
+                /* Create an active/current tablink class */
+                div.tab button.active {
+                    background-color: #ccc;
+                }
+
+        /* Style the tab content */
+        .tabcontent {
+            display: none;
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            border-top: none;
+        }
+    </style>
+
+
+    <script>
+
+
+        function OpenTab(evt, cityName) {
+            // Declare all variables
+            var i, tabcontent, tablinks;
+
+            // Get all elements with class="tabcontent" and hide them
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+
+            // Get all elements with class="tablinks" and remove the class "active"
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+
+            // Show the current tab, and add an "active" class to the button that opened the tab
+            document.getElementById(cityName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+
+
+        var captureInProgress = false;
+        var bBlank = false;
+        var bNeedClearPlaten = false;
+        var scanDeviceWidth, scanDeviceHeight;
+        var viewWidth = 320;
+        var viewHeight = 300;
+        var previewWidth = 400;  // Image size from SDK - This will change with scanner type
+        var previewHeight = 375;
+
+    </script>
+
+    <!-- CODE TO SUPPORT THE IB DEMO APP -->
+    <script src="http://localhost:5020/IBScanUltimate.min.js"></script>
+    <!-- or, <script src="https://localhost:5021/IBScanUltimate.min.js"></script>-->
+
+    <script type="text/javascript">
+
+        // Sound may not be pre-installed on Windows
+        //var okBeepSound = new Audio('/images/OK.mp3');
+        //var successBeepSound = new Audio('/images/Success.mp3');
+        //function BeepOK() {
+        //    okBeepSound.play();
+        //}
+
+        //function BeepSuccess() {
+        //    successBeepSound.play();
+
+        //}
+
+
+        var appendedText = "";
+        function WriteFunctionResult(functionName, resultCode, additionalText) {
+
+            var strFunctionResult = "-- " + functionName + " -- Return Value (" + resultCode + ")";
+            if (document.getElementById("idAppendFunctionResult").checked) {
+                if (appendedText.length > 0) appendedText += "\n";
+                appendedText += strFunctionResult;
+            } else {
+                appendedText = strFunctionResult;
+            }
+            var functionResultBox = document.getElementById("idFunctionResult");
+            functionResultBox.innerHTML = appendedText;
+            functionResultBox.scrollTop = functionResultBox.scrollHeight;
+
+
+            document.getElementById("idAdditionalInformation").innerHTML = additionalText;
+        }
+
+
+        function IBSU_GetSDKVersion() {
+            var funcName = 'IBSU_GetSDKVersion';
+            IBSU.GetSDKVersion(function onSuccess(sdkVersionInfo) {
+
+                var message = "SDK Version " + sdkVersionInfo.Product +
+                    ", DLL File version " + sdkVersionInfo.File +
+                    ", Web SDK Version " + sdkVersionInfo.WebSDKVersion;
+                WriteFunctionResult(funcName, 0, message);
+
+            }, function onError(errorObj) {
+                WriteFunctionResult(funcName, errorObj.code, errorObj.message);
+
+            });
+
+        }
+
+
+        function IBSU_GetDeviceCount() {
+            var funcName = 'IBSU_GetDeviceCount';
+            IBSU.GetDeviceCount(function onSuccess(nDevices) {
+                WriteFunctionResult(funcName, 0, nDevices + " devices connected");
+            }, function onError(errorObj) {
+                WriteFunctionResult(funcName, errorObj.code, errorObj.message);
+
+            });
+
+        };
+
+
+        function IBSU_GetDeviceDescription(deviceIndex, callback) {
+            var funcName = 'IBSU_GetDeviceDescription';
+            IBSU.GetDeviceDescription(deviceIndex, function onSuccess(deviceDescription) {
+                var strDesc = 'Serial Number: ' + deviceDescription.serialNumber + '\n' +
+                    'Product Name: ' + deviceDescription.productName + '\n' +
+                    'Interface Type: ' + deviceDescription.interfaceType + '\n' +
+                    'Firmware Version: ' + deviceDescription.fwVersion + '\n' +
+                    'Device revision: ' + deviceDescription.devRevision + '\n' +
+                    'Handle: ' + deviceDescription.handle + '\n' +
+                    'IsHandleOpened: ' + deviceDescription.IsHandleOpened;
+                WriteFunctionResult(funcName, 0, strDesc);
+
+                callback(deviceIndex, deviceDescription);
+            }, function onError(errorObj) {
+                WriteFunctionResult(funcName, errorObj.code, errorObj.message);
+
+            });
+
+        }
+
+
+        function IBSU_OpenDevice(deviceIndex, needClearPlaten, onCompletionCallback) {
+            var funcName = 'IBSU_OpenDevice';
+
+            IBSU.OpenDevice(deviceIndex, needClearPlaten, function onSuccess(handle) {
+                SetDeviceHandle(handle);
+                WriteFunctionResult(funcName, 0, 'Opened Handle# = ' + handle);
+                onCompletionCallback();
+
+            }, function onError(errorObj) {
+                WriteFunctionResult(funcName, errorObj.code, errorObj.message);
+            });
+
+        }
+
+
+        function IBSU_BGetInitProgress(deviceIndex) {
+            var funcName = 'IBSU_BGetInitProgress';
+            IBSU.BGetInitProgress(deviceIndex, function onSuccess(initResults) {
+                if (initResults.IsComplete) {
+                    SetDeviceHandle(initResults.DeviceHandle);
+                }
+                var strResult = 'IsOpen: ' + initResults.IsComplete + '\n' +
+                    'Handle: ' + initResults.DeviceHandle + '\n' +
+                    'Progress:' + initResults.ProgressValue + '%';
+                WriteFunctionResult(funcName, 0, strResult);
+
+            }, function onError(errorObj) {
+                WriteFunctionResult(funcName, errorObj.code, errorObj.message);
+            });
+        }
+
+        // Assume no async, do need clearPlaten
+        function IBSU_OpenDeviceEx(deviceIndex, uniformityMask, bAsync, bNeedClearPlaten, onCompletionCallback) {
+            var funcName = 'IBSU_OpenDeviceEx';
+
+            IBSU.OpenDeviceEx(deviceIndex, uniformityMask, bAsync, bNeedClearPlaten, function onSuccess(handle) {
+                if (bAsync) {
+                    WriteFunctionResult(funcName, 0, 'OpenedDeviceEx Started');
+                }
+                else {
+                    SetDeviceHandle(handle);
+                    WriteFunctionResult(funcName, 0, 'Opened Handle# = ' + handle);
+                }
+                onCompletionCallback();
+
+            }, function onError(errorObj) {
+                WriteFunctionResult(funcName, errorObj.code, errorObj.message);
+            });
+
+        }
+
+
+        function IBSU_IsDeviceOpened(deviceHandle) {
+            var funcName = 'IBSU_IsDeviceOpened';
+            IBSU.IsDeviceOpened(deviceHandle, function onSuccess() {
+                WriteFunctionResult(funcName, 0, 'Handle ' + deviceHandle + ' is open');
+
+            }, function onError(errorObj) {
+                WriteFunctionResult(funcName, errorObj.code, 'Handle ' + deviceHandle + ' is NOT open - ' + errorObj.message);
+            });
+
+        }
+
+
+        function IBSU_CloseDevice(deviceHandle) {
+            var funcName = 'IBSU_CloseDevice';
+            IBSU.CloseDevice(deviceHandle, function onSuccess() {
+                WriteFunctionResult(funcName, 0, 'Handle ' + deviceHandle + ' now closed');
+
+            }, function onError(errorObj) {
+                WriteFunctionResult(funcName, errorObj.code, errorObj.message);
+            });
+
+        }
+
+        function IBSU_CloseAllDevice() {
+            var funcName = 'IBSU_CloseAllDevice';
+
+            IBSU.CloseAllDevice(function onSuccess() {
+                WriteFunctionResult(funcName, 0, 'All handles now closed');
+                SetDeviceHandle(-1);
+
+            }, function onError(errorObj) {
+                WriteFunctionResult(funcName, errorObj.code, errorObj.message);
+            });
+        }
+
+        function IBSU_GetLEDs(deviceHandle) {
+            var funcName = 'IBSU_GetLEDs';
+            IBSU.GetLEDs(deviceHandle, function onSuccess(activeLEDs) {
+                var message = "Active LEDs: 0x" + activeLEDs.toString(16);
+                WriteFunctionResult(funcName, 0, message);
+
+                document.getElementById('idSetLEDValue').value = activeLEDs.toString(16);
+
+            }, function onError(errorObj) {
+                WriteFunctionResult(funcName, errorObj.code, errorObj.message);
+
+            });
+
+        };
+
+        function IBSU_SetLEDs(deviceHandle, activeLEDs) {
+            var funcName = 'IBSU_SetLEDs';
+            IBSU.SetLEDs(deviceHandle, activeLEDs, function onSuccess() {
+                var message = "LEDs were set to 0x" + activeLEDs.toString(16);
+                WriteFunctionResult(funcName, 0, message);
+
+            }, function onError(errorObj) {
+                WriteFunctionResult(funcName, errorObj.code, errorObj.message);
+
+            });
+
+        };
+
+
+        function IBSU_SetProcessingOptions(width, height, nfiq, onCompletionCallback) {
+            IBSU.SetProcessingOptions(width, height, nfiq, function onSuccess() {
+                onCompletionCallback(true);
+
+            }, function onError(errorObj) {
+                SetStatusMessage("Unable to set processing options: " + errorObj.message + '(' + errorObj.code + ')');
+                onCompletionCallback(false);
+
+            });
+        }
+
+
+        // NOTE: this works, but is too slow to use at frame preview rates.  Rolling
+        // info is sent with preview in this application
+        function IBSU_BGetRollingInfo(deviceHandle, onCompletionCallback) {
+            IBSU.BGetRollingInfo(deviceHandle, function onSuccess(rollingInformation) {
+                onCompletionCallback(true, rollingInformation);
+
+            }, function onError(errorObj) {
+                SetStatusMessage("Unable to get rolling information: " + errorObj.message + '(' + errorObj.code + ')');
+                onCompletionCallback(false, undefined);
+
+            });
+        }
+
+
+
+        function IBSU_IsCaptureAvailable(deviceHandle, imageType, imageResolution, onCompletionCallback) {
+            var funcName = 'IBSU_IsCaptureAvailable';
+            IBSU.IsCaptureAvailable(deviceHandle, imageType, imageResolution, function onSuccess(bIsAvailable) {
+                WriteFunctionResult(funcName, 0, 'CaptureAvailable: ' + bIsAvailable);
+                onCompletionCallback(bIsAvailable);
+
+            }, function onError(errorObj) {
+                WriteFunctionResult(funcName, errorObj.code, errorObj.message);
+                onCompletionCallback(false);
+
+            });
+        }
+
+        function IBSU_BeginCaptureImage(deviceHandle, imageType, imageResolution, captureOptions, onCompletionCallback) {
+            var funcName = 'IBSU_BeginCaptureImage';
+            IBSU.BeginCaptureImage(deviceHandle, imageType, imageResolution, captureOptions, function onSuccess() {
+                WriteFunctionResult(funcName, 0, 'Capture started');
+                onCompletionCallback(true, "");
+
+            }, function onError(errorObj) {
+                WriteFunctionResult(funcName, errorObj.code, errorObj.message);
+                onCompletionCallback(false, message);
+
+            });
+        }
+
+
+        function IBSU_CancelCaptureImage(deviceHandle) {
+            var funcName = 'IBSU_CancelCaptureImage';
+            IBSU.CancelCaptureImage(deviceHandle, function onSuccess() {
+                WriteFunctionResult(funcName, 0, 'Capture cancelled');
+
+            }, function onError(errorObj) {
+                WriteFunctionResult(funcName, errorObj.code, errorObj.message);
+
+            });
+
+        }
+
+        function IBSU_SetBeeper(handle, beepPattern, soundTone, duration, reserved_1, reserved_2, onCompletion) {
+            var funcName = 'IBSU_SetBeeper';
+            IBSU.SetBeeper(handle, beepPattern, soundTone, duration, reserved_1, reserved_2, function onSuccess() {
+                // Success
+                WriteFunctionResult(funcName, 0, 'Beeper set: ' + beepPattern + '(' + BeepPatternEnumToText(beepPattern) + '), ' +
+                    soundTone + ',' + duration + ',' + reserved_1 + ',' + reserved_2);
+                onCompletion();
+
+            }, function onError(errorObj) {
+                WriteFunctionResult(funcName, errorObj.code, errorObj.message);
+            });
+
+        };
+
+        function IBSU_GetOperableLEDs(deviceHandle) {
+            var funcName = 'IBSU_GetOperableLEDs';
+            IBSU.GetOperableLEDs(deviceHandle, function onSuccess(ledInfo) {
+                var message = "LED type: " + ledInfo.LedType + '(' + LEDTypeEnumToText(ledInfo.LedType) + "), LED Count: " + ledInfo.LedCount + ", Operable LEDs: 0x" + ledInfo.OperableLEDs.toString(16);
+                WriteFunctionResult(funcName, 0, message);
+
+            }, function onError(errorObj) {
+                WriteFunctionResult(funcName, errorObj.code, errorObj.message);
+
+            });
+
+        };
+
+
+        function IBSU_GetOperableBeeper(deviceHandle, completionCallback) {
+            var funcName = 'IBSU_GetOperableBeeper';
+            IBSU.GetOperableBeeper(deviceHandle, function onSuccess(beeperType) {
+                var message = "Beeper type: " + beeperType;
+                WriteFunctionResult(funcName, 0, message);
+                completionCallback(true, beeperType);
+
+            }, function onError(errorObj) {
+                WriteFunctionResult(funcName, errorObj.code, errorObj.message);
+                completionCallback(false, undefined);
+
+            });
+
+        };
+
+
+        function IBSU_SetContrast(deviceHandle, contrastValue) {
+            var funcName = 'IBSU_SetContrast';
+            IBSU.SetContrast(deviceHandle, contrastValue, function onSuccess() {
+                WriteFunctionResult(funcName, 0, 'Contrast Value set to ' + contrastValue);
+            }, function onError(errorObj) {
+                WriteFunctionResult(funcName, errorObj.code, errorObj.message);
+            });
+        }
+
+
+
+        function IBSU_GetContrast(deviceHandle, onCompletionCallback) {
+            var funcName = 'IBSU_GetContrast';
+            IBSU.GetContrast(deviceHandle, function onSuccess(contrastValue) {
+                WriteFunctionResult(funcName, 0, 'Contrast Value: ' + contrastValue);
+
+                document.getElementById("idContrastValue").value = contrastValue;
+                onCompletionCallback(contrastValue);
+
+            }, function onError(errorObj) {
+                WriteFunctionResult(funcName, errorObj.code, errorObj.message);
+            });
+        }
+
+        function IBSU_SetLEOperationMode(deviceHandle, leMode) {
+            var funcName = 'IBSU_SetLEOperationMode';
+            IBSU.SetLEOperationMode(deviceHandle, leMode, function onSuccess() {
+                WriteFunctionResult(funcName, 0, 'LE Operation Mode set to ' + leMode + '(' + LEEnumToText(leMode) + ')');
+            }, function onError(errorObj) {
+                WriteFunctionResult(funcName, errorObj.code, errorObj.message);
+            });
+        }
+
+
+
+        function IBSU_GetLEOperationMode(deviceHandle, onCompletionCallback) {
+            var funcName = 'IBSU_GetLEOperationMode';
+            IBSU.GetLEOperationMode(deviceHandle, function onSuccess(leMode) {
+                WriteFunctionResult(funcName, 0, 'LE Operation mode: ' + leMode + '(' + LEEnumToText(leMode) + ')');
+
+                // Set select to actual operation mode
+                select = document.getElementById("idLEOperationMode");
+                select.selectedIndex = leMode;  // Shortcut: assume contiguous enumeration values starting at 0
+
+                onCompletionCallback(leMode);
+
+            }, function onError(errorObj) {
+                WriteFunctionResult(funcName, errorObj.code, errorObj.message);
+            });
+        }
+
+
+        function IBSU_EnableTraceLog(bEnable) {
+            var funcName = 'IBSU_EnableTraceLog-' + bEnable;
+            IBSU.EnableTraceLog(bEnable, function onSuccess() {
+                WriteFunctionResult(funcName, 0, '');
+
+            }, function onError(errorObj) {
+                WriteFunctionResult(funcName, errorObj.code, errorObj.message);
+            });
+
+        }
+
+        function IBSU_IsTouchedFinger(deviceHandle) {
+            var funcName = 'IBSU_IsTouchedFinger';
+            IBSU.IsTouchedFinger(deviceHandle, function onSuccess(touchedFinger) {
+                WriteFunctionResult(funcName, 0, 'Touch state: ' + touchedFinger);
+
+            }, function onError(errorObj) {
+                WriteFunctionResult(funcName, errorObj.code, errorObj.message);
+            });
+        }
+
+        function IBSU_IsCaptureActive(deviceHandle) {
+            var funcName = 'IBSU_IsCaptureActive';
+            IBSU.IsCaptureActive(deviceHandle, function onSuccess(bIsActive) {
+                WriteFunctionResult(funcName, 0, 'Capture active: ' + bIsActive);
+
+            }, function onError(errorObj) {
+                WriteFunctionResult(funcName, errorObj.code, errorObj.message);
+            });
+        }
+
+
+        function IBSU_TakeResultImageManually(deviceHandle) {
+            var funcName = 'IBSU_TakeResultImageManually';
+            IBSU.TakeResultImageManually(deviceHandle, function onSuccess() {
+                WriteFunctionResult(funcName, 0, 'Manual Image Requested');
+
+            }, function onError(errorObj) {
+                WriteFunctionResult(funcName, errorObj.code, errorObj.message);
+            });
+        }
+
+
+        function IBSU_SetProperty(deviceHandle, propertyType, propertyValue, onCompletionCallback) {
+            var funcName = 'IBSU_SetProperty (' + propertyType + ')';
+            IBSU.SetProperty(deviceHandle, propertyType, propertyValue, function onSuccess() {
+                WriteFunctionResult(funcName, 0, '');
+                onCompletionCallback(true);
+
+            }, function onError(errorObj) {
+                WriteFunctionResult(funcName, errorObj.code, errorObj.message);
+                onCompletionCallback(false);
+
+            });
+        }
+
+
+        function IBSU_GetSpoofProperty(deviceHandle, propertyType, onCompletionCallback) {
+            var funcName = 'IBSU_GetProperty (' + propertyType + ' - ' + PropertyEnumToText(propertyType) + ')';
+            //document.getElementById("GetTheString").innerHTML = (funcName + ' --VVV-- ' + deviceHandle + propertyType);
+            IBSU.GetProperty(deviceHandle, propertyType, function onSuccess(propertyValue) {
+                WriteFunctionResult(funcName, 0, 'Property Value: ' + propertyValue);
+                onCompletionCallback(true, propertyValue);
+
+            }, function onError(errorObj) {
+                WriteFunctionResult(funcName, errorObj.code, errorObj.message);
+                onCompletionCallback(false, undefined);
+
+            });
+        }
+
+
+        function IBSU_GetProperty(deviceHandle, propertyType, onCompletionCallback) {
+            var funcName = 'IBSU_GetProperty (' + propertyType + ' - ' + PropertyEnumToText(propertyType) + ')';
+            document.getElementById("GetTheString").innerHTML = (funcName + ' --VVV-- ' + deviceHandle + propertyType);
+            IBSU.GetProperty(deviceHandle, propertyType, function onSuccess(propertyValue) {
+                WriteFunctionResult(funcName, 0, 'Property Value: ' + propertyValue);
+                onCompletionCallback(true, propertyValue);
+
+            }, function onError(errorObj) {
+                WriteFunctionResult(funcName, errorObj.code, errorObj.message);
+                onCompletionCallback(false, undefined);
+
+            });
+        }
+
+
+        // ------------------------------------------------------------------------------
+        // ----------- *** Tests - functions to set up calls for API interface *** -------
+        // ------------------------------------------------------------------------------
+
+        function TestIBSU_GetDeviceDescription() {
+            var strIndex = document.getElementById('idDeviceIndex').value;
+            IBSU_GetDeviceDescription(Number(strIndex), function onComplete(index, devDescription) {
+                // called function handles result
+            });
+        }
+
+
+        function TestIBSU_OpenDevice() {
+            var strIndex = document.getElementById('idDeviceIndex').value;
+            var bNeedClearPlaten = true;
+
+            IBSU_OpenDevice(Number(strIndex), bNeedClearPlaten, function onComplete(handle) {
+                // called function handles result
+            });
+
+        }
+
+        function TestIBSU_OpenDeviceEx() {
+            var strIndex = document.getElementById('idDeviceIndex').value;
+            var bAsync = document.getElementById('cbOpenAsync').checked;
+            var strUniformityMaskPath = document.getElementById('idUniformityMaskPath').value;
+            var bNeedClearPlaten = true;
+
+            // Input type 'file' only result in fake URL as below
+            //var uniformityMaskPath = (window.URL || window.webkitURL).createObjectURL(file);
+            //console.log('path', uniformityMaskPath);
+
+            IBSU_OpenDeviceEx(Number(strIndex), strUniformityMaskPath, bAsync, bNeedClearPlaten, function onComplete(handle) {
+                // called function handles result
+            });
+
+        }
+
+        function TestIBSU_CloseDevice(idHandle) {
+            var strHandle = document.getElementById(idHandle).value;
+            IBSU_CloseDevice(Number(strHandle));
+        }
+
+        function TestIBSU_IsDeviceOpened(idHandle) {
+            var strHandle = document.getElementById(idHandle).value;
+            IBSU_IsDeviceOpened(Number(strHandle));
+        }
+
+        function TestIBSU_CancelCaptureImage(idHandle) {
+            var strHandle = document.getElementById(idHandle).value;
+            IBSU_CancelCaptureImage(Number(strHandle));
+        }
+
+        function TestIBSU_BGetInitProgress() {
+            var strIndex = document.getElementById('idDeviceIndex').value;
+            IBSU_BGetInitProgress(Number(strIndex));
+        }
+
+        function GetPropertyType() {
+            var propertyElement = document.getElementById("idPropertyType");
+            var propertyOptionIndex = propertyElement.selectedIndex;
+            var propertyType = Number(propertyElement.options[propertyOptionIndex].value);
+            return propertyType;
+        }
+
+        function TestIBSU_SetProperty(idHandle) {
+            var strHandle = document.getElementById(idHandle).value;
+            var strValue = document.getElementById('idSetPropertyValue').value;
+            var propertyType = GetPropertyType();
+
+            IBSU_SetProperty(Number(strHandle), propertyType, strValue, function onComplete(success) {
+                // Called function handles result
+            });
+        }
+
+        function TestIBSU_IsTouchedFinger(idHandle) {
+            var strHandle = document.getElementById(idHandle).value;
+            IBSU_IsTouchedFinger(Number(strHandle));
+        }
+
+        function TestIBSU_IsCaptureActive(idHandle) {
+            var strHandle = document.getElementById(idHandle).value;
+            IBSU_IsCaptureActive(Number(strHandle));
+        }
+
+
+        function TestIBSU_GetContrast(idHandle) {
+            var strHandle = document.getElementById(idHandle).value;
+            IBSU_GetContrast(Number(strHandle), function onComplete(contrastValue) {
+            });
+        }
+
+        function TestIBSU_SetContrast(idHandle) {
+            var strHandle = document.getElementById(idHandle).value;
+            var strContrastValue = document.getElementById('idContrastValue').value;
+            IBSU_SetContrast(Number(strHandle), Number(strContrastValue));
+        }
+
+        function TestIBSU_GetOperableLEDs(idHandle) {
+            var strHandle = document.getElementById(idHandle).value;
+            IBSU_GetOperableLEDs(Number(strHandle));
+        }
+
+        function TestIBSU_GetLEDs(idHandle) {
+            var strHandle = document.getElementById(idHandle).value;
+            IBSU_GetLEDs(Number(strHandle));
+        }
+
+        function TestIBSU_GetOperableBeeper(idHandle) {
+            var strHandle = document.getElementById(idHandle).value;
+            IBSU_GetOperableBeeper(Number(strHandle), function onComplete(bSuccess, beeperType) {
+                // Called function processed result
+            });
+        }
+
+
+        function TestIBSU_SetBeeper(idHandle) {
+            var strHandle = document.getElementById(idHandle).value;
+
+            var select = document.getElementById("idBeepPattern");
+            var beepOptionIndex = select.selectedIndex;
+            var beepPattern = Number(select.options[beepOptionIndex].value);
+            var soundTone = Number(document.getElementById('idSoundTone').value);
+            var duration = Number(document.getElementById('idDuration').value);
+            var reserved_1 = Number(document.getElementById('idReserved_1').value);
+            var reserved_2 = Number(document.getElementById('idReserved_2').value);
+
+            IBSU_SetBeeper(Number(strHandle), beepPattern, soundTone, duration, reserved_1, reserved_2);
+        }
+
+
+        var re_hexNum = /^[\da-f]+$/i;
+
+        // Convert hex to decimal with validation
+        function Hex2num(s_hex) {
+            if (!re_hexNum.exec(s_hex)) {
+                WriteFunctionResult('Hex conversion', -9999, 'Invalid Hex number: ' + s_hex);
+                return -9999;
+            }
+            n_num = parseInt(s_hex, 16)
+            return n_num;
+        }
+
+        function TestIBSU_SetLEDs(idHandle) {
+            var strHandle = document.getElementById(idHandle).value;
+            var ledHexValue = document.getElementById('idSetLEDValue').value;
+
+            ledValue = Hex2num(ledHexValue);
+
+            if (ledValue >= 0) {
+                IBSU_SetLEDs(Number(strHandle), ledValue);
+            }
+        }
+
+
+        function TestIBSU_IsCaptureAvailable(idHandle) {
+            var strHandle = document.getElementById(idHandle).value;
+
+            var captureElement = document.getElementById("captureType");
+            var captureOptionIndex = captureElement.selectedIndex;
+            var captureType = Number(captureElement.options[captureOptionIndex].value);
+            var imgRes = IBSU_ImageResolution.ENUM_IBSU_IMAGE_RESOLUTION_500;
+
+            IBSU_IsCaptureAvailable(Number(strHandle), captureType, imgRes, function onComplete(bIsAvailable) {
+
+            });
+
+        }
+
+
+        function TestIBSU_GetLEOperationMode(idHandle) {
+            var strHandle = document.getElementById(idHandle).value;
+            IBSU_GetLEOperationMode(Number(strHandle), function onComplete(leOperationMode) {
+                // Handled in called function
+            });
+        }
+
+
+        function TestIBSU_SetLEOperationMode(idHandle) {
+            var strHandle = document.getElementById(idHandle).value;
+            var strContrastValue = document.getElementById('idContrastValue').value;
+
+            var leModeElement = document.getElementById("idLEOperationMode");
+            var leOptionIndex = leModeElement.selectedIndex;
+            var leOperationMode = Number(leModeElement.options[leOptionIndex].value);
+
+            IBSU_SetLEOperationMode(Number(strHandle), Number(leOperationMode));
+        }
+
+        function TestIBSU_BeginCaptureImage(idHandle) {
+            var strHandle = document.getElementById(idHandle).value;
+
+            var captureElement = document.getElementById("captureType");
+            var captureOptionIndex = captureElement.selectedIndex;
+            var captureType = Number(captureElement.options[captureOptionIndex].value);
+            var imgRes = IBSU_ImageResolution.ENUM_IBSU_IMAGE_RESOLUTION_500;
+
+
+            var captureOptions = 0;
+            if (document.getElementById("cbAutoContrast").checked)
+                captureOptions |= IBSU_OPTION_AUTO_CONTRAST;
+            if (document.getElementById("cbAutoCapture").checked)
+                captureOptions |= IBSU_OPTION_AUTO_CAPTURE;
+            if (document.getElementById("cbInvalidFinger").checked)
+                captureOptions |= IBSU_OPTION_IGNORE_FINGER_COUNT;
+
+            IBSU_BeginCaptureImage(Number(strHandle), captureType, imgRes, captureOptions, function onComplete(bSuccess, strMessage) {
+
+            });
+
+        }
+
+        function TestIBSU_TakeResultImageManually(idHandle) {
+            var strHandle = document.getElementById(idHandle).value;
+            IBSU_TakeResultImageManually(Number(strHandle));
+        }
+
+
+        //Set all deviceHandle elements to this device handle
+        function SetDeviceHandle(deviceHandle) {
+            document.getElementById("idDeviceHandle").value = deviceHandle;
+            document.getElementById("idCaptureDeviceHandle").value = deviceHandle;
+            document.getElementById("idControlDeviceHandle").value = deviceHandle;
+
+        }
+
+        function TestIBSU_GetProperty(idHandle) {
+            var strHandle = document.getElementById(idHandle).value;
+            var propertyType = GetPropertyType();
+            IBSU_GetProperty(Number(strHandle), propertyType, function onComplete(success, propertyValue) {
+                // Called function handles result
+            });
+
+        }
+
+
+        function TestIBSU_EnableTraceLog() {
+            var bEnable = document.getElementById("cbEnableTraceLog").checked;
+            IBSU_EnableTraceLog(bEnable);
+        }
+
+        // ----------- *** End Tests *** -------
+        // ------------------------------------------------------------------------------
+
+
+
+
+        function GetImageTypeName(imageType) {
+            var imgTypeName = "-- Unknown --";
+            switch (imageType) {
+                case IBSU_ImageType.ENUM_IBSU_ROLL_SINGLE_FINGER:
+                    imgTypeName = "-- Rolling single finger --";
+                    break;
+                case IBSU_ImageType.ENUM_IBSU_FLAT_SINGLE_FINGER:
+                    imgTypeName = "-- Flat single finger --";
+                    break;
+                case IBSU_ImageType.ENUM_IBSU_FLAT_TWO_FINGERS:
+                    imgTypeName = "-- Flat two fingers --";
+                    break;
+                case IBSU_ImageType.ENUM_IBSU_FLAT_FOUR_FINGERS:
+                    imgTypeName = "-- Flat 4 fingers --";
+                    break;
+                default:
+                    break;
+            }
+            return imgTypeName;
+        }
+
+
+
+        // Callbacks from Websocket connection to SDK interface
+        IBSU.onSDKConnection = function () {
+            SetStatusMessage("SDK Ready");
+        }
+        IBSU.onSDKClose = function (event) {
+            SetStatusMessage('SDK Connection closed. Code: ' + event.code + '. Reason: ' + event.reason);
+        }
+
+        IBSU.onSDKConnectionError = function (event) {
+            SetStatusMessage('SDK Socket connect error');
+        }
+
+
+
+        // Callbacks from the IBScanUltimate SDK
+        IBSU.onResultImageEx = function (deviceHandle, imageStatus, scannerImage, imageType, detectedFingerCount, scannerImageArray, segmentArray, nfiqArray) {
+
+
+
+            var imgTypeName = GetImageTypeName(imageType);
+
+            FlashButton('ResultImageEx', imgTypeName + " acquisition completed");
+
+            if (document.getElementById("cbShowImage").checked) {
+                var message = "";
+                if (imageStatus >= IBSU_STATUS_OK) {
+
+                    if (imageType == IBSU_ImageType.ENUM_IBSU_ROLL_SINGLE_FINGER) {
+                        //BeepOK();
+                        var imageElement = document.getElementById("idFpImage");
+                        imageElement.setAttribute('src', "data:image/bmp;base64," + scannerImage.StrImageBitmapBase64);
+                    }
+
+
+                } else {
+                    message = imgTypeName + " acquisition fail (Error code = " + imageStatus + ")";
+                }
+            }
+
+        }
+
+        function ShowNFIQ(nfiqArray) {
+            if (document.getElementById("cbNFIQ").checked) {
+                var separator = '';
+                var nfiqString = "";
+                var i = 0;
+                for (i = 0; i < nfiqArray.length; i++) {
+                    nfiqString += separator + nfiqArray[i];
+                    separator = "-";
+                }
+
+                document.getElementById("idNFIQResults").innerHTML = nfiqString;
+            }
+        }
+
+
+
+        IBSU.onPreviewImage = function (deviceHandle, imageData, rollingInformation) {
+
+            FlashButton('PreviewImage', 'DeviceHandle: ' + deviceHandle);
+
+            if (document.getElementById("cbShowImage").checked) {
+
+                var imageElement = document.getElementById("idFpImage");
+                imageElement.setAttribute('src', "data:image/png;base64," + imageData.StrImagePngBase64);
+
+                // Notes: Scan image dimensions can vary based on captureType
+                //   - For preview, bitmap is always scaled to the view dimensions, but original attributes are still passed in 'imageData' object
+                scanDeviceWidth = imageData.Width;
+                scanDeviceHeight = imageData.Height;
+            }
+
+        }
+
+        IBSU.onPressedKeyButtons = function (deviceIndex, pressedKeyButtons) {
+
+            FlashButton('PressedKeyButtons', 'DeviceIndex: ' + deviceIndex + ', buttons: ' + pressedKeyButtons);
+
+        }
+
+        IBSU.onNotifyMessage = function (deviceHandle, notifyMessage) {
+
+            FlashButton('NotifyMessage', 'Handle: ' + deviceHandle + ', Message: ' + notifyMessage);
+
+        }
+
+
+        IBSU.onClearPlatenAtCapture = function (deviceIndex, platenState) {
+
+            FlashButton('ClearPlatenAtCapture', 'DeviceIndex: ' + deviceIndex + ', state: ' + platenState);
+
+        }
+
+        IBSU.onCompleteAcquisition = function (deviceHandle, imageType) {
+
+            FlashButton('CompleteAcquisition', imageType);
+        }
+
+        IBSU.onTakingAcquisition = function (deviceHandle, imageType) {
+
+            FlashButton('TakingAcquisition', 'DeviceHandle: ' + deviceHandle + ', ImageType: ' + imageType);
+
+        }
+
+
+
+        IBSU.onDeviceCommunicationBreak = function (deviceIndex) {
+            FlashButton('DeviceCommunicationBreak', 'DeviceIndex: ' + deviceIndex);
+        }
+
+        IBSU.onDeviceCount = function (deviceCount) {
+            FlashButton('DeviceCount', 'DeviceCount: ' + deviceCount);
+            IBSU_CloseAllDevice();  // To prevent confusion
+        };
+
+
+
+        function GetQualityString(qualityState) {
+            var result = '';
+            switch (qualityState) {
+                case IBSU_FingerQualityState.ENUM_IBSU_QUALITY_GOOD:
+                    result = "(Good)";
+                    break;
+                case IBSU_FingerQualityState.ENUM_IBSU_QUALITY_FAIR:
+                    result = "(Fair)";
+                    break;
+                case IBSU_FingerQualityState.ENUM_IBSU_QUALITY_POOR:
+                    result = "(Poor)";
+                    break;
+                case IBSU_FingerQualityState.ENUM_IBSU_QUALITY_INVALID_AREA_TOP:
+                    result = "(Inv-Top)";
+                    break;
+                case IBSU_FingerQualityState.ENUM_IBSU_QUALITY_INVALID_AREA_LEFT:
+                    result = "(Inv-Left)";
+                    break;
+                case IBSU_FingerQualityState.ENUM_IBSU_QUALITY_INVALID_AREA_RIGHT:
+                    result = "(Inv-Right)";
+                    break;
+                case IBSU_FingerQualityState.ENUM_IBSU_QUALITY_INVALID_AREA_BOTTOM:
+                    result = "(Inv-Bottom)";
+                    break;
+                case IBSU_FingerQualityState.ENUM_IBSU_FINGER_NOT_PRESENT:
+                    result = "(Non)";
+                    break;
+                default:
+                    return;
+            }
+            return result;
+        }
+
+        IBSU.onFingerQuality = function (deviceHandle, fingerQualityArray) {
+            var separator = '';
+            var message = '';
+            var i = 0;
+            for (i = 0; i < fingerQualityArray.length; i++) {
+                message += separator + GetQualityString(fingerQualityArray[i]);
+                separator = '-';
+            }
+
+            FlashButton('FingerQuality', message);
+        };
+
+
+        // Flash an SVG button prefixed by idBtnCallback, with text box prefix idCallback to value
+        function FlashButton(baseID, resultText) {
+            var svgID = 'idBtn' + baseID;
+            document.getElementById(svgID).style.fill = 'lightgreen';
+            var tbID = 'idCallback' + baseID;
+            document.getElementById(tbID).value = resultText;
+
+            // Clear button and value after interval
+            setTimeout(function () {
+                document.getElementById(svgID).style.fill = 'gray';
+                //document.getElementById(tbID).value = '';
+            }, 300);
+        }
+
+
+        IBSU.onInitProgress = function (deviceIndex, progressValue) {
+            FlashButton('InitProgress', progressValue + '%');
+        };
+
+
+        IBSU.onAsyncOpenDevice = function (deviceIndex, deviceHandle, errorCode) {
+            FlashButton('AsyncOpenDevice', deviceHandle);
+
+            var funcName = 'onAsyncOpenDevice';
+            if (errorCode == 0) {
+                SetDeviceHandle(deviceHandle);
+                WriteFunctionResult(funcName, 0, 'Opened Handle# = ' + deviceHandle + ' on device index ' + deviceIndex);
+            } else {
+                WriteFunctionResult(funcName, errorCode, 'Problem during AsyncOpenDevice');
+            }
+
+        }
+
+
+        IBSU.onFingerCount = function (deviceHandle, fingerCountState) {
+
+            FlashButton('FingerCount', fingerCountState);
+
+        };
+
+
+
+        function AddOption(select, selValue, strText) {
+            var opt = document.createElement('option');
+            opt.value = selValue;
+            opt.innerHTML = strText;
+            select.appendChild(opt);
+        }
+
+
+
+        function SetStatusMessage(strMessage) {
+            document.getElementById("statusInfo").innerHTML = strMessage;
+        }
+
+
+        function PropertyEnumToText(propertyEnum) {
+            for (var name in IBSU_PropertyId) {
+                if (IBSU_PropertyId.hasOwnProperty(name)) {
+                    if (propertyEnum == IBSU_PropertyId[name]) {
+                        return name;
+                    }
+                }
+            }
+        }
+
+
+        function LEEnumToText(leEnum) {
+            for (var name in IBSU_LEOperationMode) {
+                if (IBSU_LEOperationMode.hasOwnProperty(name)) {
+                    if (leEnum == IBSU_LEOperationMode[name]) {
+                        return name;
+                    }
+                }
+            }
+        }
+
+
+        function LEDTypeEnumToText(ledType) {
+            for (var name in IBSU_LedType) {
+                if (IBSU_LedType.hasOwnProperty(name)) {
+                    if (ledType == IBSU_LedType[name]) {
+                        return name;
+                    }
+                }
+            }
+        }
+
+
+
+        function BeepPatternEnumToText(beepEnum) {
+            for (var name in IBSU_BeepPattern) {
+                if (IBSU_BeepPattern.hasOwnProperty(name)) {
+                    if (beepEnum == IBSU_BeepPattern[name]) {
+                        return name;
+                    }
+                }
+            }
+        }
+
+
+
+
+        // Load all capture types, without checking for scanner type
+        function LoadCaptureOptions() {
+            var select = document.getElementById("captureType");
+            select.options.length = 0;//remove all options
+            AddOption(select, IBSU_ImageType.ENUM_IBSU_FLAT_SINGLE_FINGER, CAPTURE_SEQ_FLAT_SINGLE_FINGER);
+            AddOption(select, IBSU_ImageType.ENUM_IBSU_ROLL_SINGLE_FINGER, CAPTURE_SEQ_ROLL_SINGLE_FINGER);
+            AddOption(select, IBSU_ImageType.ENUM_IBSU_FLAT_TWO_FINGERS, CAPTURE_SEQ_2_FLAT_FINGERS);
+            AddOption(select, IBSU_ImageType.ENUM_IBSU_FLAT_FOUR_FINGERS, CAPTURE_SEQ_4_FLAT_FINGERS);
+        }
+
+        function Init() {
+            document.getElementById("idMain").click(); // Show first tab page
+
+            var select = document.getElementById("idPropertyType");
+            for (var name in IBSU_PropertyId) {
+                if (IBSU_PropertyId.hasOwnProperty(name)) {
+                    AddOption(select, IBSU_PropertyId[name], name);
+                }
+            }
+
+            select = document.getElementById("idLEOperationMode");
+            for (var name in IBSU_LEOperationMode) {
+                if (IBSU_LEOperationMode.hasOwnProperty(name)) {
+                    AddOption(select, IBSU_LEOperationMode[name], name);
+                }
+            }
+
+            select = document.getElementById("idBeepPattern");
+            for (var name in IBSU_BeepPattern) {
+                if (IBSU_BeepPattern.hasOwnProperty(name)) {
+                    AddOption(select, IBSU_BeepPattern[name], name);
+                }
+            }
+
+
+            LoadCaptureOptions();
+
+            TestIBSU_EnableTraceLog();
+        }
+
+
+
+    </script>
+
+</head>
+<body onload="Init();">
+    <div style="width:700Px; height:70px; background-image:url(/images/IB_logo_2C_1.png); background-repeat:no-repeat; background-size: contain; position:relative "
+         id="PageHeader">
+
+        <div style="color:dodgerblue; font-size:150%; width:700px; text-align:right; position:absolute; right:15px">
+            IBSU Web SDK Function Tester
+        </div>
+        <div style="color:dodgerblue; width:700px; text-align:right;     position: absolute; top: 40px; right:15px">
+            Copyright (c) Integrated Biometrics 2021
+        </div>
+    </div>
+    &nbsp;
+
+    <div class="parent">
+
+        <div id="left">
+
+            <div class="tab">
+                <button class="tablinks" id="idMain" onclick="OpenTab(event, 'Main')">Main</button>
+                <button class="tablinks" id="idCapture" onclick="OpenTab(event, 'Capture')">Capture</button>
+                <button class="tablinks" id="idControl" onclick="OpenTab(event, 'Control')">Control</button>
+            </div>
+
+            <div id="Main" class="tabcontent">
+                <input type="button" value="IBSU_GetSDKVersion" onclick="IBSU_GetSDKVersion();" style="font-size : 12px;" />
+                <input type="button" value="IBSU_GetDeviceCount" onclick="IBSU_GetDeviceCount();" />
+                <span id="GetTheString"></span>
+                <fieldset>
+                    <legend>Function by Index</legend>
+
+                    <table width="100%">
+                        <tr>
+                            <td valign="bottom">Device Index: <br /><input type="number" id="idDeviceIndex" value="0" style="width:40px" /></td>
+                            <td> <input type="button" value="IBSU_GetDeviceDescription" onclick="TestIBSU_GetDeviceDescription();" /> </td>
+                        </tr>
+                        <tr>
+                            <td>&nbsp;</td>
+                            <td> <input type="button" value="IBSU_OpenDevice" onclick="TestIBSU_OpenDevice();" /> </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">&gt;&gt; Extension Functions for OpenDevice &lt;&lt; ------------------</td>
+
+                        </tr>
+                        <tr>
+                            <td>&nbsp;</td>
+                            <td>
+                                <input type="button" value="IBSU_OpenDeviceEx" onclick="TestIBSU_OpenDeviceEx();" />
+                                <input type="button" value="IBSU_BGetInitProgress" onclick="TestIBSU_BGetInitProgress();" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>&nbsp;</td>
+                            <td>
+                                <input type="checkbox" id="cbOpenAsync" />Async <br />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Unif. Mask Path:</td>
+                            <td>
+                                <input type="text" id="idUniformityMaskPath" value="" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">Leave blank to store Uniformity Mask in %APPDATA%\IntegratedBiometrics folder</td>
+                        </tr>
+
+                    </table>
+
+                </fieldset>
+
+                <fieldset>
+                    <legend>Function by Handle</legend>
+
+                    <table width="100%">
+                        <tr>
+                            <td>Device Handle: <br /><input type="number" id="idDeviceHandle" value="-1" style="width:40px" /></td>
+                            <td>
+                                <input type="button" value="IBSU_CloseDevice" onclick="TestIBSU_CloseDevice('idDeviceHandle');" />
+                                <input type="button" value="IBSU_CloseAllDevice" onclick="IBSU_CloseAllDevice();" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>&nbsp;</td>
+                            <td> <input type="button" value="IBSU_IsDeviceOpened" onclick="TestIBSU_IsDeviceOpened('idDeviceHandle');" /> </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"> <select id="idPropertyType" style="font-size:x-small"></select> </td>
+                        </tr>
+                        <tr>
+                            <td>&nbsp;</td>
+                            <td>
+                                <input type="button" value="IBSU_GetProperty" onclick="TestIBSU_GetProperty('idDeviceHandle');" />
+
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>&nbsp;</td>
+                            <td>
+                                <input type="button" value="IBSU_SetProperty" onclick="TestIBSU_SetProperty('idDeviceHandle');" />
+                                <input type="text" id="idSetPropertyValue" value="" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>&nbsp;</td>
+                            <td>
+                                <input type="checkbox" id="cbEnableTraceLog" checked onclick="TestIBSU_EnableTraceLog();" />IBSU_EnableTraceLog
+                            </td>
+                        </tr>
+
+                    </table>
+
+                </fieldset>
+
+
+            </div>
+
+            <div id="Capture" class="tabcontent">
+
+                <div>Device Handle:<input type="number" id="idCaptureDeviceHandle" value="-1" style="width:40px" /></div>
+                <div>
+                    <input type="button" value="IBSU_IsCaptureActive" onclick="TestIBSU_IsCaptureActive('idCaptureDeviceHandle');" />
+                    <input type="button" value="IBSU_IsTouchedFinger" onclick="TestIBSU_IsTouchedFinger('idCaptureDeviceHandle');" />
+                </div>
+
+                <fieldset>
+                    <legend>Image Acquisition</legend>
+                    <div>
+                        Image type: <select id="captureType"></select>
+                        <input type="button" value="IBSU_IsCaptureAvailable" onclick="TestIBSU_IsCaptureAvailable('idCaptureDeviceHandle');" />
+                    </div>
+                    <div>
+                        <input type="checkbox" id="cbAutoContrast" /> Automatic Contrast Optimization
+                    </div>
+                    <div>
+                        <input type="checkbox" id="cbAutoCapture" /> Automatic capture for Fingerprints
+                    </div>
+                    <div>
+                        <input type="checkbox" id="cbInvalidFinger" /> Trigger Invalid Finger count on auto-capture mode
+                    </div>
+                    <div>
+                        <input type="button" value="IBSU_BeginCaptureImage" onclick="TestIBSU_BeginCaptureImage('idCaptureDeviceHandle');" />
+                        <input type="button" value="IBSU_CancelCaptureImage" onclick="TestIBSU_CancelCaptureImage('idCaptureDeviceHandle');" />
+                    </div>
+                    <div>
+                        <input type="button" value="IBSU_TakeResultImageManually" onclick="TestIBSU_TakeResultImageManually('idCaptureDeviceHandle');" />
+                    </div>
+
+                </fieldset>
+
+                <fieldset>
+                    <legend>Get and Set Contrast</legend>
+                    <div>
+                        <input type="button" value="IBSU_GetContrast" onclick="TestIBSU_GetContrast('idCaptureDeviceHandle');" />
+                    </div>
+                    <div>
+                        <input type="button" value="IBSU_SetContrast" onclick="TestIBSU_SetContrast('idCaptureDeviceHandle');" />
+                        <input type="number" id="idContrastValue" value="21" style="width:40px" /> (0 ~ 34)
+                    </div>
+                </fieldset>
+
+
+            </div>
+
+            <div id="Control" class="tabcontent">
+
+                <div>Device Handle:<input type="number" id="idControlDeviceHandle" value="-1" style="width:40px" /></div>
+                <fieldset>
+                    <legend>LE Operation</legend>
+                    <div>
+                        <input type="button" value="IBSU_GetLEOperationMode" onclick="TestIBSU_GetLEOperationMode('idControlDeviceHandle');" />
+                    </div>
+                    <div>
+                        <select id="idLEOperationMode" style="font-size:x-small"></select>
+                        <input type="button" value="IBSU_SetLEOperationMode" onclick="TestIBSU_SetLEOperationMode('idControlDeviceHandle');" />
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>LED Operation</legend>
+                    <div>
+                        <input type="button" value="IBSU_GetOperableLEDs" onclick="TestIBSU_GetOperableLEDs('idControlDeviceHandle');" />
+                        <input type="button" value="IBSU_GetLEDs" onclick="TestIBSU_GetLEDs('idControlDeviceHandle');" />
+                    </div>
+                    <div>
+                        <input type="button" value="IBSU_SetLEDs" onclick="TestIBSU_SetLEDs('idControlDeviceHandle');" />
+                        <input type="text" id="idSetLEDValue" /> (HEX Value)
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Beeper Operation</legend>
+                    <div>
+                        <input type="button" value="IBSU_GetOperableBeeper" onclick="TestIBSU_GetOperableBeeper('idControlDeviceHandle');" />
+                    </div>
+                    <div>
+                        <input type="button" value="IBSU_SetBeeper" onclick="TestIBSU_SetBeeper('idControlDeviceHandle');" />
+                    </div>
+
+                    <div>
+                        <table width="100%">
+                            <tr>
+                                <td>Beep Pattern</td>
+                                <td colspan="3"> <select id="idBeepPattern" style="font-size:x-small"></select>  </td>
+                            </tr>
+                            <tr>
+                                <td>Sound Tone:</td>
+                                <td><input type="number" id="idSoundTone" style="width:40px" /> (0 ~ 2) </td>
+                                <td align="right">Duration</td>
+                                <td><input type="number" id="idDuration" style="width:80px" /> (In 25ms) </td>
+                            </tr>
+                            <tr>
+                                <td>Reserved_1</td>
+                                <td><input type="number" id="idReserved_1" style="width:40px" /></td>
+                                <td align="right">Reserved_2</td>
+                                <td><input type="number" id="idReserved_2" style="width:80px" /></td>
+                            </tr>
+                        </table>
+                    </div>
+
+                </fieldset>
+            </div>
+
+        </div>
+
+        <div id="logresponse" style="position: absolute; top: 2px; left: 550px; background-image:url(/images/fingerprint_bg.jpg)">
+        <input type="checkbox" id="idAppendFunctionResult" />Append Function Result -------------------------------------------
+        <div class="titleHeader">
+            Result Value
+        </div>
+        <textarea id="idFunctionResult" style="width:95%; height:40px; margin:5px"></textarea>
+        <div class="titleHeader">
+            Additional Information
+        </div>
+        <textarea id="idAdditionalInformation" style="width:95%; height:160px; margin:5px"></textarea>
+        </div>
+    
+    </div>
+
+    <div class="parent" style="position:absolute; top: 425px; left: 560px" id="statusBar">
+        <input type="checkbox" id="cbShowImage" />Show Image&nbsp;&nbsp;
+        Status: <span id="statusInfo"></span>
+        <div id="imageHolder">
+            <div id="instructionsID" style="position:absolute"></div>
+            <img id="idFpImage" width="320" height="300">
+
+            <svg id="svgImageOverlays" y="0" width="320" height="300" style="position:relative;  z-index: 5; left:00px; top:0px;">
+                <line id="idRollingLine" x1="150" y1="10" x2="150" y2="240" style="stroke:red;stroke-width:2;opacity:0.0" />
+                <polygon id="idQuadrangle0" points="0,0 5,5 45,10 0,0" style="fill:none;stroke:green;stroke-width:2;opacity:0.0" />
+                <polygon id="idQuadrangle1" points="0,0 5,5 45,10 0,0" style="fill:none;stroke:green;stroke-width:2;opacity:0.0" />
+                <polygon id="idQuadrangle2" points="0,0 5,5 45,10 0,0" style="fill:none;stroke:green;stroke-width:2;opacity:0.0" />
+                <polygon id="idQuadrangle3" points="0,0 5,5 45,10 0,0" style="fill:none;stroke:green;stroke-width:2;opacity:0.0" />
+            </svg>
+        </div>
+    </div>
+
+    <div id="right" style="position: absolute; top: 600px; left: 10px; padding:1px; margin:10px; font-size:xx-small">
+
+        <fieldset>
+            <legend>Callback Fired</legend>
+
+            <table width="100%">
+
+                <tr>
+                    <td>
+                        <svg height="10" width="10">
+                            <circle id="idBtnInitProgress" cx="5" cy="5" r="5" stroke="black" stroke-width="1" fill="gray" />
+                        </svg>
+                    </td>
+                    <td>
+                        InitProgress
+                    </td>
+                    <td style="text-align:right">
+                        <input type="text" id="idCallbackInitProgress" disabled />
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <svg height="10" width="10">
+                            <circle id="idBtnPreviewImage" cx="5" cy="5" r="5" stroke="black" stroke-width="1" fill="gray" />
+                        </svg>
+                    </td>
+                    <td>
+                        PreviewImage
+                    </td>
+                    <td style="text-align:right">
+                        <input type="text" id="idCallbackPreviewImage" disabled />
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <svg height="10" width="10">
+                            <circle id="idBtnTakingAcquisition" cx="5" cy="5" r="5" stroke="black" stroke-width="1" fill="gray" />
+                        </svg>
+                    </td>
+                    <td>
+                        TakingAcquisition
+                    </td>
+                    <td style="text-align:right">
+                        <input type="text" id="idCallbackTakingAcquisition" disabled />
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <svg height="10" width="10">
+                            <circle id="idBtnCompleteAcquisition" cx="5" cy="5" r="5" stroke="black" stroke-width="1" fill="gray" />
+                        </svg>
+                    </td>
+                    <td>
+                        CompleteAcquisition
+                    </td>
+                    <td style="text-align:right">
+                        <input type="text" id="idCallbackCompleteAcquisition" disabled />
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <svg height="10" width="10">
+                            <circle id="idBtnResultImageEx" cx="5" cy="5" r="5" stroke="black" stroke-width="1" fill="gray" />
+                        </svg>
+                    </td>
+                    <td>
+                        ResultImageEx
+                    </td>
+                    <td style="text-align:right">
+                        <input type="text" id="idCallbackResultImageEx" disabled />
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <svg height="10" width="10">
+                            <circle id="idBtnFingerCount" cx="5" cy="5" r="5" stroke="black" stroke-width="1" fill="gray" />
+                        </svg>
+                    </td>
+                    <td>
+                        FingerCount
+                    </td>
+                    <td style="text-align:right">
+                        <input type="text" id="idCallbackFingerCount" disabled />
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <svg height="10" width="10">
+                            <circle id="idBtnFingerQuality" cx="5" cy="5" r="5" stroke="black" stroke-width="1" fill="gray" />
+                        </svg>
+                    </td>
+                    <td>
+                        FingerQuality
+                    </td>
+                    <td style="text-align:right">
+                        <input type="text" id="idCallbackFingerQuality" disabled />
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <svg height="10" width="10">
+                            <circle id="idBtnDeviceCommunicationBreak" cx="5" cy="5" r="5" stroke="black" stroke-width="1" fill="gray" />
+                        </svg>
+                    </td>
+                    <td>
+                        DeviceCommunicationBreak
+                    </td>
+                    <td style="text-align:right">
+                        <input type="text" id="idCallbackDeviceCommunicationBreak" disabled />
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <svg height="10" width="10">
+                            <circle id="idBtnDeviceCount" cx="5" cy="5" r="5" stroke="black" stroke-width="1" fill="gray" />
+                        </svg>
+                    </td>
+                    <td>
+                        DeviceCount
+                    </td>
+                    <td style="text-align:right">
+                        <input type="text" id="idCallbackDeviceCount" disabled />
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <svg height="10" width="10">
+                            <circle id="idBtnClearPlatenAtCapture" cx="5" cy="5" r="5" stroke="black" stroke-width="1" fill="gray" />
+                        </svg>
+                    </td>
+                    <td>
+                        ClearPlatenAtCapture
+                    </td>
+                    <td style="text-align:right">
+                        <input type="text" id="idCallbackClearPlatenAtCapture" disabled />
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <svg height="10" width="10">
+                            <circle id="idBtnAsyncOpenDevice" cx="5" cy="5" r="5" stroke="black" stroke-width="1" fill="gray" />
+                        </svg>
+                    </td>
+                    <td>AsyncOpenDevice</td>
+                    <td style="text-align:right">
+                        <input type="text" id="idCallbackAsyncOpenDevice" disabled />
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <svg height="10" width="10">
+                            <circle id="idBtnNotifyMessage" cx="5" cy="5" r="5" stroke="black" stroke-width="1" fill="gray" />
+                        </svg>
+                    </td>
+                    <td>NotifyMessage</td>
+                    <td style="text-align:right">
+                        <input type="text" id="idCallbackNotifyMessage" disabled />
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <svg height="10" width="10">
+                            <circle id="idBtnPressedKeyButtons" cx="5" cy="5" r="5" stroke="black" stroke-width="1" fill="gray" />
+                        </svg>
+                    </td>
+                    <td>KeyButton</td>
+                    <td style="text-align:right">
+                        <input type="text" id="idCallbackPressedKeyButtons" disabled />
+                    </td>
+                </tr>
+
+
+
+            </table>
+
+        </fieldset>
+    </div>
+</body>
+
+
+</html>
